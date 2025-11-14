@@ -19,7 +19,7 @@ class UserResource extends JsonResource
             'whatsapp' => $this->whatsapp,
             'avatar' => $this->avatar ? asset($this->avatar) : null,
             'ratings' => RatingResource::collection($this->whenLoaded('ratings')),
-
+            'is_verified' => $this->is_verified ,
         ];
     }
 }

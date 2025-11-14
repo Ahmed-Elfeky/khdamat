@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -48,6 +47,14 @@ class User extends Authenticatable
 
 
 
+
+    public function isOtpValid($otp)
+    {
+        return $this->otp_code === $otp && $this->otp_expires_at && now()->lt($this->otp_expires_at);
+    }
+
+
+
     public function ratings()
     {
         return $this->hasMany(Rating::class, 'service_provider_id');
@@ -65,7 +72,7 @@ class User extends Authenticatable
     /**
      * علاقة المستخدم بالتقييمات اللي استلمها (كمزوّد خدمة)
      */
-    public function ratingsReceived()
+    public function receivedRatings()
     {
         return $this->hasMany(Rating::class, 'service_provider_id');
     }

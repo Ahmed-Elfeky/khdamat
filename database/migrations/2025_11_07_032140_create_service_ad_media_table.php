@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('service_ad_media', function (Blueprint $table) {
             $table->id();
             $table->foreignId('service_ad_id')->constrained('service_ads')->onDelete('cascade');
-            $table->string('file_path'); // مسار الصورة أو الفيديو
+            $table->string('file_path'); 
             $table->enum('type', ['image', 'video'])->default('image'); // نوع الملف
             $table->timestamps();
         });

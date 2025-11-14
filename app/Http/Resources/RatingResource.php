@@ -18,7 +18,7 @@ class RatingResource extends JsonResource
             'service_provider_name' => $this->serviceProvider?->name,
             'rating' => $this->rating,
             'comment' => $this->comment,
-            'created_at' => $this->created_at->diffForHumans(),
+            // 'created_at' => $this->created_at->diffForHumans(),
         ];
     }
 }

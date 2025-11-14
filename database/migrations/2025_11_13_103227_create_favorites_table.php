@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('service_types', function (Blueprint $table) {
+        Schema::create('favorites', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); // اسم نوع الخدمة
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('service_ad_id')->constrained()->onDelete('cascade');
+            $table->unique(['user_id', 'service_ad_id']); // منع التكرار
             $table->timestamps();
         });
     }
@@ -23,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('service_types');
+        Schema::dropIfExists('favorites');
     }
 };

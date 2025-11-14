@@ -27,7 +27,6 @@ class DatabaseSeeder extends Seeder
             CitySeeder::class,
             RegionSeeder::class,
             CategorySeeder::class,
-            ServiceTypeSeeder::class,
         ]);
     }
 }

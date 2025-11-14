@@ -12,9 +12,8 @@ return new class extends Migration {
             $table->string('title');
             $table->text('description')->nullable();
             $table->decimal('price', 10, 2)->nullable();
-            $table->string('price_type')->nullable();
+            $table->enum('type', ['show', 'service', 'exchange'])->default('show'); //نوع الخدمة عرض - تبادل - خدمة
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
-            $table->foreignId('service_type_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('city_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('region_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');

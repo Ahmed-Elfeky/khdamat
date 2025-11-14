@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ServiceTypeResource extends JsonResource
+class ServiceAdMediaResourc extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,12 +14,10 @@ class ServiceTypeResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return
-
-        [
+        return [
             'id' => $this->id,
-            'name' => $this->name,
-        ]
-        ;
+            'type' => $this->type,
+            'url' => asset('storage/' . $this->file_path),
+        ];
     }
 }

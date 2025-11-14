@@ -4,8 +4,11 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreServiceAdRequest extends FormRequest
+class UpdateServiceAdRequest extends FormRequest
 {
+    /**
+     * Determine if the user is authorized to make this request.
+     */
     public function authorize(): bool
     {
         return true;
@@ -13,23 +16,23 @@ class StoreServiceAdRequest extends FormRequest
 
     public function rules(): array
     {
+
         return [
-            'title'            => 'required|string|max:255',
-            'description'      => 'nullable|string',
-            'price'            => 'nullable|numeric|min:0',
-            'type'             => 'required|in:show,service,exchange',
-            'category_id'      => 'required|exists:categories,id',
-            'city_id'          => 'nullable|exists:cities,id',
-            'region_id'        => 'nullable|exists:regions,id',
-            'media'            => 'nullable|array',
-            'media.*'          => 'file|mimetypes:image/*,video/*|max:20480', // 20MB
+            'title'       => 'sometimes|string|max:255',
+            'description' => 'sometimes|nullable|string',
+            'price'       => 'sometimes|nullable|numeric|min:0',
+            'type'        => 'sometimes|in:show,service,exchange',
+            'category_id' => 'sometimes|exists:categories,id',
+            'city_id'     => 'sometimes|nullable|exists:cities,id',
+            'region_id'   => 'sometimes|nullable|exists:regions,id',
+            'is_active'   => 'sometimes|boolean',
+            'media'       => 'sometimes|array',
+            'media.*'     => 'sometimes|file|mimetypes:image/*,video/*|max:20480',
         ];
     }
-
     public function messages(): array
     {
         return [
-            'title.required'     => 'عنوان الإعلان مطلوب.',
             'title.max'          => 'عنوان الإعلان لا يمكن أن يتجاوز 255 حرفًا.',
             'price.numeric'      => 'السعر يجب أن يكون رقمًا.',
             'category_id.exists' => 'الفئة المحددة غير موجودة.',

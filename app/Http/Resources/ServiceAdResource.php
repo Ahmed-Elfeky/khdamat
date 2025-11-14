@@ -13,11 +13,11 @@ class ServiceAdResource extends JsonResource
             'title'         => $this->title,
             'description'   => $this->description,
             'price'         => $this->price,
-            'price_type'    => $this->price_type,
+            'type'          => $this->type,
             'category'      => new CategoryResource($this->whenLoaded('category')),
-            'service_type'  => new ServiceTypeResource($this->whenLoaded('serviceType')),
             'city'          => new CityResource($this->whenLoaded('city')),
             'region'        => new RegionResource($this->whenLoaded('region')),
+            'media'         => ServiceAdMediaResourc::collection($this->whenLoaded('media')),
             'is_active'     => $this->is_active,
             'created_at'    => $this->created_at->format('Y-m-d'),
         ];

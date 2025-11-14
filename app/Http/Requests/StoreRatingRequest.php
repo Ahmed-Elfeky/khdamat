@@ -23,7 +23,6 @@ class StoreRatingRequest extends FormRequest
     {
         return [
             'rating' => 'required|integer|min:1|max:5',
-            'user_id' => 'required|exists:users,id',
             'service_provider_id' => 'required|exists:users,id',
             'comment' => 'nullable|string|max:500',
         ];

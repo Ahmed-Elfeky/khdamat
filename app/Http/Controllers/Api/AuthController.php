@@ -37,21 +37,15 @@ class AuthController extends Controller
             'otp_expires_at' => Carbon::now()->addMinutes(5),
         ]);
 
-      
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return ApiResponse::SendResponse(201, 'User registered successfully. Please verify your OTP.', [
             new UserResource($user),
             'otp_code' => $user->otp_code,
             'is_verified' => false,
-                        'token' => $token,
-
         ]);
     }
-
-
-
-
 
     public function verifyOtp(VerifyOtpRequest $request)
     {
@@ -74,17 +68,13 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return ApiResponse::SendResponse(404, 'Email verified successfully', [
-            'user' => new UserResource($user),
-            'token' => $token,
-        ]);
-
         return ApiResponse::SendResponse(
             200,
             'Email verified successfully',
             [
-                'token' => $token,
                 'user' => new UserResource($user),
+                'token' => $token,
+
             ]
         );
     }
