@@ -45,9 +45,6 @@ class User extends Authenticatable
     ];
 
 
-
-
-
     public function isOtpValid($otp)
     {
         return $this->otp_code === $otp && $this->otp_expires_at && now()->lt($this->otp_expires_at);
@@ -55,6 +52,11 @@ class User extends Authenticatable
 
 
 
+    public function serviceAds()
+    {
+        return $this->hasMany(ServiceAd::class);
+    }
+    
     public function ratings()
     {
         return $this->hasMany(Rating::class, 'service_provider_id');

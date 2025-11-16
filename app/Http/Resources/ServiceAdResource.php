@@ -13,10 +13,15 @@ class ServiceAdResource extends JsonResource
             'title'         => $this->title,
             'description'   => $this->description,
             'price'         => $this->price,
+            // logic for reward
+            'reward'        => $this->when($this->type === 'request', $this->reward),
+            //  logic for exchange يظهر فقط لو type = exchange
+            'exchange'      => $this->when($this->type === 'exchange', $this->exchange),
+
             'type'          => $this->type,
-            'category'      => new CategoryResource($this->whenLoaded('category')),
-            'city'          => new CityResource($this->whenLoaded('city')),
-            'region'        => new RegionResource($this->whenLoaded('region')),
+            // 'category'      => new CategoryResource($this->whenLoaded('category')),
+            // 'city'          => new CityResource($this->whenLoaded('city')),
+            // 'region'        => new RegionResource($this->whenLoaded('region')),
             'media'         => ServiceAdMediaResourc::collection($this->whenLoaded('media')),
             'is_active'     => $this->is_active,
             'created_at'    => $this->created_at->format('Y-m-d'),

@@ -13,6 +13,8 @@ class ServiceAd extends Model
         'title',
         'description',
         'price',
+        'exchange',
+        'reward',
         'type',
         'category_id',
         'city_id',
@@ -31,7 +33,6 @@ class ServiceAd extends Model
     {
         return $this->belongsTo(Category::class);
     }
-
     public function city()
     {
         return $this->belongsTo(City::class);
@@ -46,5 +47,4 @@ class ServiceAd extends Model
     {
         return $this->belongsTo(User::class);
     }
-    
 }

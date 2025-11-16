@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateCategoryRequest;
 use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 use App\Helpers\ApiResponse;
+use App\Models\User;
 
 class CategoryController extends Controller
 {
@@ -44,7 +45,7 @@ class CategoryController extends Controller
         );
     }
 
-  
+
     public function destroy($id)
     {
         $category = Category::find($id);
@@ -57,4 +58,23 @@ class CategoryController extends Controller
 
         return ApiResponse::SendResponse(200, 'Category deleted successfully');
     }
+
+
+   public function providers($id)
+{
+    // نجيب المستخدمين اللي عندهم إعلانات داخل الكاتيجوري المحدد
+    $users = User::whereHas('serviceAds', function($q) use ($id) {
+        $q->where('category_id', $id);
+    })
+    ->withAvg('receivedRatings as average_rating', 'rating')  
+        ->orderByDesc('average_rating')
+    ->get();
+
+    return ApiResponse::SendResponse(
+        200,
+        "Providers retrieved successfully",
+        $users
+    );
+}
+
 }

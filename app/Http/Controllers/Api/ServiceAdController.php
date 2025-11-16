@@ -27,56 +27,74 @@ class ServiceAdController extends Controller
 
     public function store(StoreServiceAdRequest $request)
     {
-        $data = $request->validated();
-
         if (!Auth::check()) {
             return ApiResponse::SendResponse(401, 'You must be logged in to create a service ad.', []);
         }
-
         if (Auth::user()->role !== 'provider') {
             return ApiResponse::SendResponse(403, 'You are not authorized to create a service ad.', []);
         }
-
+        $data = $request->validated();
         $data['user_id'] = Auth::id();
+        //  تحقق من تكرار الإعلان
+        $exists = ServiceAd::where('user_id', Auth::id())
+            ->where('title', $data['title'])
+            ->where('type', $data['type'])
+            ->exists();
+
+        if ($exists) {
+            return ApiResponse::SendResponse(409, 'You have already created a similar service ad.', []);
+        }
+        //  Logic ل reward و exchange
+        if ($data['type'] !== 'request') {
+            $data['reward'] = null;
+        }
+        if ($data['type'] !== 'exchange') {
+            $data['exchange'] = null;
+        }
 
         $ad = ServiceAd::create($data);
-        // استدعاء التريت لرفع الميديا
         $this->handleMediaUpload($request, $ad->id);
+        // إعادة الإعلان مع تحميل العلاقات
+        $ad->load(['city', 'region', 'category', 'media']);
 
         return ApiResponse::SendResponse(
             201,
             'Service ad created successfully',
-            new ServiceAdResource($ad->load(['city', 'region', 'category', 'media']))
+            new ServiceAdResource($ad)
         );
     }
-
     public function update(UpdateServiceAdRequest $request, $id)
     {
+        if (!Auth::check()) {
+            return ApiResponse::SendResponse(401, 'You must be logged in to update a service ad.', []);
+        }
         $ad = ServiceAd::find($id);
         if (!$ad) {
             return ApiResponse::SendResponse(404, 'Service ad not found.', []);
         }
+
         if (Auth::id() !== $ad->user_id && Auth::user()->role !== 'admin') {
             return ApiResponse::SendResponse(403, 'You are not authorized to update this service ad.', []);
         }
 
         $data = $request->validated();
-        dd($data);
-        if (!empty($data)) {
-            $ad->update($data);
+
+        //  Logic ل reward و exchange
+        if (($data['type'] ?? $ad->type) !== 'request') {
+            $data['reward'] = null;
         }
-        if ($request->hasFile('media')) {
-            foreach ($ad->media as $media) {
-                $filePath = storage_path('app/public/' . $media->file_path);
-                if (file_exists($filePath)) unlink($filePath);
-                $media->delete();
-            }
-            $this->handleMediaUpload($request, $ad->id);
+        if (($data['type'] ?? $ad->type) !== 'exchange') {
+            $data['exchange'] = null;
         }
+        $ad->update($data);
+        $this->handleMediaUpload($request, $ad->id);
+        // تحميل العلاقات قبل الإرجاع
+        $ad->load(['city', 'region', 'category', 'media']);
+
         return ApiResponse::SendResponse(
             200,
             'Service ad updated successfully',
-            new ServiceAdResource($ad->load(['city', 'region', 'category', 'media']))
+            new ServiceAdResource($ad)
         );
     }
 
@@ -89,7 +107,6 @@ class ServiceAdController extends Controller
         $ad->delete();
         return ApiResponse::SendResponse(200, 'Service ad deleted successfully', []);
     }
-
 
     public function filter(Request $request)
     {
@@ -106,15 +123,56 @@ class ServiceAdController extends Controller
             $query->where('city_id', $request->city_id);
         }
 
-        // فلترة حسب النوع (enum: service, show, exchange) إذا موجود
+        // فلترة حسب النوع (enum: service, show, exchange)
         if ($request->filled('type')) {
             $query->where('type', $request->type);
         }
-
+        // فلترة حسب المستخدم صاحب الإعلان
+        if ($request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
+        }
         // ترتيب النتائج حسب الأحدث أولاً
         $ads = $query->latest()->get();
 
-        // إرجاع النتائج بشكل موحد
         return ApiResponse::SendResponse(200, 'Service ads retrieved successfully', $ads);
+    }
+    public function getAllServices()
+    {
+        $ads = ServiceAd::with(['user', 'category', 'city', 'region', 'media'])
+            ->where('type', 'service')
+            ->latest()
+            ->get();
+        if ($ads->isEmpty()) {
+            return ApiResponse::SendResponse(404, 'No service ads found', []);
+        }
+        return ApiResponse::SendResponse(
+            200,
+            "All service ads retrieved successfully",
+            ServiceAdResource::collection($ads)
+        );
+    }
+    public function allExchange()
+    {
+        $ads = ServiceAd::with(['user', 'category', 'city', 'region', 'media'])->where('type', 'exchange')->latest()->get();
+        if ($ads->isEmpty()) {
+            return ApiResponse::SendResponse(404, 'No Exchange ads found', []);
+        }
+        return ApiResponse::SendResponse(
+            200,
+            "All Exchange ads retrieved successfully",
+            ServiceAdResource::collection($ads)
+        );
+    }
+    public function allRequest()
+    {
+        $ads = ServiceAd::with(['user', 'category', 'city', 'region', 'media'])->where('type', 'request')->latest()->get();
+        if ($ads->isEmpty()) {
+            return ApiResponse::SendResponse(404, 'No Requests ads found', []);
+        }
+        return ApiResponse::SendResponse(
+            200,
+            "All Requests ads retrieved successfully",
+            ServiceAdResource::collection($ads)
+        );
     }
 }
