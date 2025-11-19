@@ -23,7 +23,6 @@ return new class extends Migration
             // بيانات إضافية اختيارية
             $table->string('phone')->nullable();
             $table->string('avatar')->nullable();
-            $table->string('specialization')->nullable(); // نوع الخدمة مثلاً: كهرباء، سباكة...
             $table->string('whatsapp')->nullable(); // رقم واتساب للتواصل
             $table->rememberToken();
             $table->timestamps();

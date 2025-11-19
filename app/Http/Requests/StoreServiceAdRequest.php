@@ -11,23 +11,26 @@ class StoreServiceAdRequest extends FormRequest
         return true;
     }
 
- public function rules()
-{
-    return [
-        'title'       => 'required|string|max:255',
-        'description' => 'nullable|string',
-        'price'       => 'nullable|numeric|min:0',
-        // الكافئة
-        'reward'      => 'required_if:type,request|nullable|numeric|min:0',
-        // في حالة التبادل
-        'exchange'    => 'required_if:type,exchange|nullable|string|max:255',
-        'type'        => 'required|in:ads,service,exchange,request',
-        'category_id' => 'required|exists:categories,id',
-        'city_id'     => 'nullable|exists:cities,id',
-        'region_id'   => 'nullable|exists:regions,id',
-        'is_active'   => 'nullable|boolean',
-    ];
-}
+    public function rules()
+    {
+        return [
+            'title'       => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price'       => 'nullable|numeric|min:0',
+            // الكافئة
+            'reward'      => 'required_if:type,request|nullable|numeric|min:0',
+            // في حالة التبادل
+            'exchange'    => 'required_if:type,exchange|nullable|string|max:255',
+            'type'        => 'required|in:ads,service,exchange,request',
+            'category_id' => 'required|exists:categories,id',
+            'city_id'     => 'nullable|exists:cities,id',
+            'region_id'   => 'nullable|exists:regions,id',
+            'is_active'   => 'nullable|boolean',
+            'media'       => 'nullable|array|min:1',
+            'media.*'     => 'file|mimes:jpg,jpeg,png,mp4,mov,avi|max:20480',
+
+        ];
+    }
 
 
 

@@ -13,9 +13,7 @@ use Illuminate\Support\Facades\Auth;
 
 class RatingController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index($serviceProviderId)
     {
         $serviceProviderId = User::find($serviceProviderId);
@@ -57,15 +55,12 @@ class RatingController extends Controller
         return ApiResponse::SendResponse(201, 'Rating created successfully.', new RatingResource($rating));
     }
 
-
     public function topProviders()
     {
         $topProviders = User::withAvg('receivedRatings', 'rating')
             ->withCount('receivedRatings')
             ->orderByDesc('received_ratings_avg_rating')
-            ->take(10)
-            ->get(['id', 'name', 'avatar']); 
-
+            ->take(10)->get(['id', 'name', 'avatar']);
         return ApiResponse::SendResponse(
             200,
             'Top rated providers',
@@ -73,9 +68,6 @@ class RatingController extends Controller
         );
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy($id)
     {
         $rating = Rating::find($id);

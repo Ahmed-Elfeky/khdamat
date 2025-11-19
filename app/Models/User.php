@@ -18,7 +18,6 @@ class User extends Authenticatable
         'role',
         'phone',
         'avatar',
-        'specialization',
         'whatsapp',
         'otp_code',
         'otp_expires_at',
@@ -50,13 +49,12 @@ class User extends Authenticatable
         return $this->otp_code === $otp && $this->otp_expires_at && now()->lt($this->otp_expires_at);
     }
 
-
-
+   
     public function serviceAds()
     {
         return $this->hasMany(ServiceAd::class);
     }
-    
+
     public function ratings()
     {
         return $this->hasMany(Rating::class, 'service_provider_id');
@@ -82,18 +80,18 @@ class User extends Authenticatable
     /**
      * دالة بسيطة لمعرفة نوع المستخدم
      */
-    public function isProvider()
-    {
-        return $this->role === 'provider';
-    }
+    // public function isProvider()
+    // {
+    //     return $this->role === 'provider';
+    // }
 
-    public function isCustomer()
-    {
-        return $this->role === 'customer';
-    }
+    // public function isCustomer()
+    // {
+    //     return $this->role === 'customer';
+    // }
 
-    public function isAdmin()
-    {
-        return $this->role === 'admin';
-    }
+    // public function isAdmin()
+    // {
+    //     return $this->role === 'admin';
+    // }
 }

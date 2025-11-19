@@ -11,6 +11,7 @@ use App\Http\Requests\UpdateServiceAdRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Traits\HandlesMediaUploads;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ServiceAdController extends Controller
 {
@@ -34,16 +35,8 @@ class ServiceAdController extends Controller
             return ApiResponse::SendResponse(403, 'You are not authorized to create a service ad.', []);
         }
         $data = $request->validated();
-        $data['user_id'] = Auth::id();
-        //  تحقق من تكرار الإعلان
-        $exists = ServiceAd::where('user_id', Auth::id())
-            ->where('title', $data['title'])
-            ->where('type', $data['type'])
-            ->exists();
 
-        if ($exists) {
-            return ApiResponse::SendResponse(409, 'You have already created a similar service ad.', []);
-        }
+        $data['user_id'] = Auth::id();
         //  Logic ل reward و exchange
         if ($data['type'] !== 'request') {
             $data['reward'] = null;
@@ -68,6 +61,7 @@ class ServiceAdController extends Controller
         if (!Auth::check()) {
             return ApiResponse::SendResponse(401, 'You must be logged in to update a service ad.', []);
         }
+
         $ad = ServiceAd::find($id);
         if (!$ad) {
             return ApiResponse::SendResponse(404, 'Service ad not found.', []);
@@ -79,16 +73,26 @@ class ServiceAdController extends Controller
 
         $data = $request->validated();
 
-        //  Logic ل reward و exchange
         if (($data['type'] ?? $ad->type) !== 'request') {
             $data['reward'] = null;
         }
         if (($data['type'] ?? $ad->type) !== 'exchange') {
             $data['exchange'] = null;
         }
+
         $ad->update($data);
+
+        if ($request->hasFile('files')) {
+            foreach ($ad->media as $media) {
+                Storage::disk('public')->delete($media->file_path);
+                $media->delete();
+            }
+        }
+
+        //  إضافة الجديدة (لو في)
         $this->handleMediaUpload($request, $ad->id);
-        // تحميل العلاقات قبل الإرجاع
+
+        // تحميل العلاقات
         $ad->load(['city', 'region', 'category', 'media']);
 
         return ApiResponse::SendResponse(
@@ -97,6 +101,7 @@ class ServiceAdController extends Controller
             new ServiceAdResource($ad)
         );
     }
+
 
     public function destroy($id)
     {

@@ -19,12 +19,12 @@ class ServiceAdResource extends JsonResource
             'exchange'      => $this->when($this->type === 'exchange', $this->exchange),
 
             'type'          => $this->type,
-            // 'category'      => new CategoryResource($this->whenLoaded('category')),
             // 'city'          => new CityResource($this->whenLoaded('city')),
             // 'region'        => new RegionResource($this->whenLoaded('region')),
             'media'         => ServiceAdMediaResourc::collection($this->whenLoaded('media')),
             'is_active'     => $this->is_active,
             'created_at'    => $this->created_at->format('Y-m-d'),
+            'category'      => new CategoryResource($this->category),
         ];
     }
 }

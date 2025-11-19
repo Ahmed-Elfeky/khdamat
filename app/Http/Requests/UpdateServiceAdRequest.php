@@ -28,6 +28,9 @@ class UpdateServiceAdRequest extends FormRequest
             'city_id'     => 'nullable|exists:cities,id',
             'region_id'   => 'nullable|exists:regions,id',
             'is_active'   => 'nullable|boolean',
+            'media'       => 'nullable|array|min:1',
+            'media.*'     => 'file|mimes:jpg,jpeg,png,mp4,mov,avi|max:20480',
+
         ];
     }
 

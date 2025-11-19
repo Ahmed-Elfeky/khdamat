@@ -17,6 +17,7 @@ Route::post('/login', [AuthController::class, 'login']);
 
 // filter route //
 Route::get('ads/filter', [ServiceAdController::class, 'filter']);
+Route::get('categories/{id}/users', [CategoryController::class, 'getUsersByCategory']);
 
 
 Route::middleware('auth:sanctum')->group(function () {

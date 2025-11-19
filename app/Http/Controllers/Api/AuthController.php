@@ -110,4 +110,5 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
         return ApiResponse::SendResponse(200, 'Logged out successfully', []);
     }
+
 }
