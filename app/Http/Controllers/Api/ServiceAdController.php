@@ -58,6 +58,7 @@ class ServiceAdController extends Controller
     }
     public function update(UpdateServiceAdRequest $request, $id)
     {
+
         if (!Auth::check()) {
             return ApiResponse::SendResponse(401, 'You must be logged in to update a service ad.', []);
         }
@@ -67,7 +68,7 @@ class ServiceAdController extends Controller
             return ApiResponse::SendResponse(404, 'Service ad not found.', []);
         }
 
-        if (Auth::id() !== $ad->user_id && Auth::user()->role !== 'admin') {
+        if (Auth::id() !== $ad->user_id) {
             return ApiResponse::SendResponse(403, 'You are not authorized to update this service ad.', []);
         }
 
@@ -88,10 +89,8 @@ class ServiceAdController extends Controller
                 $media->delete();
             }
         }
-
         //  إضافة الجديدة (لو في)
         $this->handleMediaUpload($request, $ad->id);
-
         // تحميل العلاقات
         $ad->load(['city', 'region', 'category', 'media']);
 

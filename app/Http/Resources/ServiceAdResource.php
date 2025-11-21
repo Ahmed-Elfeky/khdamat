@@ -17,7 +17,6 @@ class ServiceAdResource extends JsonResource
             'reward'        => $this->when($this->type === 'request', $this->reward),
             //  logic for exchange يظهر فقط لو type = exchange
             'exchange'      => $this->when($this->type === 'exchange', $this->exchange),
-
             'type'          => $this->type,
             // 'city'          => new CityResource($this->whenLoaded('city')),
             // 'region'        => new RegionResource($this->whenLoaded('region')),

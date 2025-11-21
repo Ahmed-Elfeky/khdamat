@@ -15,6 +15,8 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
 Route::post('/login', [AuthController::class, 'login']);
 
+
+
 // filter route //
 Route::get('ads/filter', [ServiceAdController::class, 'filter']);
 Route::get('categories/{id}/users', [CategoryController::class, 'getUsersByCategory']);
@@ -31,6 +33,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('cities', CityController::class);
     Route::apiResource('ads', ServiceAdController::class);
 
+    Route::post('update-ad/{id}' , [ServiceAdController::class , 'update']);
+    
     Route::post('service-ads/{id}/media', [ServiceAdMediaController::class, 'store']);
     Route::delete('service-ads/media/{id}', [ServiceAdMediaController::class, 'destroy']);
 
