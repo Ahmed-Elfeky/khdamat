@@ -18,14 +18,14 @@ class FavoriteResource extends JsonResource
             // fav id //
             'id'           => $this->id,
             //الاعلان
-            'service_ad'   => [
-                'id'       => $this->serviceAd->id,
-                'title'    => $this->serviceAd->title,
-                'price'    => $this->serviceAd->price,
+            'ads'   => [
+                'id'       => $this->ads->id,
+                'title'    => $this->ads->title,
+                'price'    => $this->ads->price,
                 // صاحب الاعلان
                 'user'     => [
-                    'id'   => $this->serviceAd->user->id,
-                    'name' => $this->serviceAd->user->name,
+                    'id'   => $this->ads->user->id,
+                    'name' => $this->ads->user->name,
                 ],
             ],
         ];

@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreServiceAdRequest extends FormRequest
+class StoreAdRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -25,7 +25,7 @@ class StoreServiceAdRequest extends FormRequest
             'category_id' => 'required|exists:categories,id',
             'city_id'     => 'nullable|exists:cities,id',
             'region_id'   => 'nullable|exists:regions,id',
-            'is_active'   => 'nullable|boolean',
+            'status'      => 'nullable|in:active,pending,rejected,expired',
             'media'       => 'nullable|array|min:1',
             'media.*'     => 'file|mimes:jpg,jpeg,png,mp4,mov,avi|max:20480',
 

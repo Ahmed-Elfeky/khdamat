@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('favorites', function (Blueprint $table) {
+        Schema::create('ad_media', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('ad_id')->constrained()->onDelete('cascade');
-            $table->unique(['user_id', 'ad_id']); // منع التكرار
+            $table->foreignId('ad_id')->constrained('ads')->onDelete('cascade');
+            $table->string('file_path');
+            $table->enum('type', ['image', 'video'])->default('image'); // نوع الملف
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('favorites');
+        Schema::dropIfExists('ad_media');
     }
 };

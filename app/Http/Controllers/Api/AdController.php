@@ -3,30 +3,30 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreServiceAdRequest;
-use App\Http\Resources\ServiceAdResource;
-use App\Models\ServiceAd;
+use App\Http\Requests\StoreAdRequest;
+use App\Http\Resources\AdResource;
+use App\Models\Ad;
 use App\Helpers\ApiResponse;
-use App\Http\Requests\UpdateServiceAdRequest;
+use App\Http\Requests\UpdateAdRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Traits\HandlesMediaUploads;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-class ServiceAdController extends Controller
+class AdController extends Controller
 {
     use HandlesMediaUploads;
 
     public function index()
     {
-        $ads = ServiceAd::with(['category', 'serviceType', 'city', 'region'])->get();
+        $ads = Ad::with(['category', 'serviceType', 'city', 'region'])->get();
         if ($ads->isEmpty()) {
             return ApiResponse::SendResponse(404, 'No service ads found', []);
         }
-        return ApiResponse::SendResponse(200, 'All service ads retrieved successfully', ServiceAdResource::collection($ads));
+        return ApiResponse::SendResponse(200, 'All service ads retrieved successfully', AdResource::collection($ads));
     }
 
-    public function store(StoreServiceAdRequest $request)
+    public function store(StoreAdRequest $request)
     {
         if (!Auth::check()) {
             return ApiResponse::SendResponse(401, 'You must be logged in to create a service ad.', []);
@@ -45,7 +45,7 @@ class ServiceAdController extends Controller
             $data['exchange'] = null;
         }
 
-        $ad = ServiceAd::create($data);
+        $ad = Ad::create($data);
         $this->handleMediaUpload($request, $ad->id);
         // إعادة الإعلان مع تحميل العلاقات
         $ad->load(['city', 'region', 'category', 'media']);
@@ -53,17 +53,17 @@ class ServiceAdController extends Controller
         return ApiResponse::SendResponse(
             201,
             'Service ad created successfully',
-            new ServiceAdResource($ad)
+            new AdResource($ad)
         );
     }
-    public function update(UpdateServiceAdRequest $request, $id)
+    public function update(UpdateAdRequest $request, $id)
     {
 
         if (!Auth::check()) {
             return ApiResponse::SendResponse(401, 'You must be logged in to update a service ad.', []);
         }
 
-        $ad = ServiceAd::find($id);
+        $ad = Ad::find($id);
         if (!$ad) {
             return ApiResponse::SendResponse(404, 'Service ad not found.', []);
         }
@@ -97,14 +97,14 @@ class ServiceAdController extends Controller
         return ApiResponse::SendResponse(
             200,
             'Service ad updated successfully',
-            new ServiceAdResource($ad)
+            new AdResource($ad)
         );
     }
 
 
     public function destroy($id)
     {
-        $ad = ServiceAd::find($id);
+        $ad = Ad::find($id);
         if (!$ad) {
             return ApiResponse::SendResponse(404, 'Service ad not found', []);
         }
@@ -115,7 +115,7 @@ class ServiceAdController extends Controller
     public function filter(Request $request)
     {
         // بداية الاستعلام
-        $query = ServiceAd::with(['user', 'category', 'city']);
+        $query = Ad::with(['user', 'category', 'city']);
 
         // فلترة حسب التصنيف إذا موجود
         if ($request->filled('category_id')) {
@@ -142,7 +142,7 @@ class ServiceAdController extends Controller
     }
     public function getAllServices()
     {
-        $ads = ServiceAd::with(['user', 'category', 'city', 'region', 'media'])
+        $ads = Ad::with(['user', 'category', 'city', 'region', 'media'])
             ->where('type', 'service')
             ->latest()
             ->get();
@@ -152,31 +152,64 @@ class ServiceAdController extends Controller
         return ApiResponse::SendResponse(
             200,
             "All service ads retrieved successfully",
-            ServiceAdResource::collection($ads)
+            AdResource::collection($ads)
         );
     }
     public function allExchange()
     {
-        $ads = ServiceAd::with(['user', 'category', 'city', 'region', 'media'])->where('type', 'exchange')->latest()->get();
+        $ads = Ad::with(['user', 'category', 'city', 'region', 'media'])->where('type', 'exchange')->latest()->get();
         if ($ads->isEmpty()) {
             return ApiResponse::SendResponse(404, 'No Exchange ads found', []);
         }
         return ApiResponse::SendResponse(
             200,
             "All Exchange ads retrieved successfully",
-            ServiceAdResource::collection($ads)
+            AdResource::collection($ads)
         );
     }
     public function allRequest()
     {
-        $ads = ServiceAd::with(['user', 'category', 'city', 'region', 'media'])->where('type', 'request')->latest()->get();
+        $ads = Ad::with(['user', 'category', 'city', 'region', 'media'])->where('type', 'request')->latest()->get();
         if ($ads->isEmpty()) {
             return ApiResponse::SendResponse(404, 'No Requests ads found', []);
         }
         return ApiResponse::SendResponse(
             200,
             "All Requests ads retrieved successfully",
-            ServiceAdResource::collection($ads)
+            AdResource::collection($ads)
         );
     }
+
+
+
+   public function status(Request $request)
+{
+    $user = auth()->user();  // ✔ المستخدم الحالي
+
+    // الحالة المطلوبة (default = active)
+    $status = $request->query('status', 'active');
+
+    // query
+    $ads = Ad::with(['media', 'city'])
+        ->where('user_id', $user->id)  // ✔ دلوقتي عنده id
+        ->where('status', $status)
+        ->latest()
+        ->paginate(10);
+
+    return ApiResponse::SendResponse(200, 'User ads retrieved', [
+        'status' => $status,
+        'counts' => [
+            'active'   => $user->ads()->where('status', 'active')->count(),
+            'pending'  => $user->ads()->where('status', 'pending')->count(),
+            'rejected' => $user->ads()->where('status', 'rejected')->count(),
+            'expired'  => $user->ads()->where('status', 'expired')->count(),
+        ],
+        'ads' => AdResource::collection($ads)->resource,
+    ]);
 }
+
+}
+
+
+
+

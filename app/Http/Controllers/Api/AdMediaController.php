@@ -3,21 +3,20 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\ServiceAd;
-use App\Models\ServiceAdMedia;
 use App\Helpers\ApiResponse;
-use App\Http\Requests\StoreServiceAdRequest;
-use Illuminate\Http\Request;
+use App\Http\Requests\StoreAdRequest;
+use App\Models\Ad;
+use App\Models\AdMedia;
 use Illuminate\Support\Facades\Storage;
 
-class ServiceAdMediaController extends Controller
+class AdMediaController extends Controller
 {
-   public function store(StoreServiceAdRequest $request, $adId)
+   public function store(StoreAdRequest $request, $adId)
 {
     // Validation
     $request->validated();
     // Check if ad exists
-    $ad = ServiceAd::find($adId);
+    $ad = Ad::find($adId);
     if (!$ad) {
         return ApiResponse::SendResponse(404, 'Service ad not found', []);
     }
@@ -47,7 +46,7 @@ foreach ($request->file('files') as $file) {
         $path = $file->store('service_ads', 'public');
         $type = str_contains($file->getMimeType(), 'video') ? 'video' : 'image';
 
-        $media = ServiceAdMedia::create([
+        $media = AdMedia::create([
             'service_ad_id' => $adId,
             'file_path' => $path,
             'type' => $type,
@@ -66,7 +65,7 @@ foreach ($request->file('files') as $file) {
 
     public function destroy($id)
     {
-        $media = ServiceAdMedia::find($id);
+        $media = AdMedia::find($id);
         if (!$media) {
             return ApiResponse::SendResponse(404, 'Media file not found', []);
         }

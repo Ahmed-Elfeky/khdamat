@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('service_ad_media', function (Blueprint $table) {
+        Schema::create('banners', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('service_ad_id')->constrained('service_ads')->onDelete('cascade');
-            $table->string('file_path'); 
-            $table->enum('type', ['image', 'video'])->default('image'); // نوع الملف
+            $table->string('image');
             $table->timestamps();
         });
     }
@@ -25,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('service_ad_media');
+        Schema::dropIfExists('banners');
     }
 };

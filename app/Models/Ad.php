@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ServiceAd extends Model
+class Ad extends Model
 {
     use HasFactory;
 
@@ -20,14 +20,15 @@ class ServiceAd extends Model
         'city_id',
         'region_id',
         'user_id',
-        'is_active'
+        'status'
     ];
 
 
     public function media()
     {
-        return $this->hasMany(ServiceAdMedia::class);
+        return $this->hasMany(AdMedia::class);
     }
+
 
     public function category()
     {

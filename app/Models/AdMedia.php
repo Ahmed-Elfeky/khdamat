@@ -4,17 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-    class ServiceAdMedia extends Model
+    class AdMedia extends Model
 {
     protected $fillable = [
-        'service_ad_id',
+        'ad_id',
         'file_path',
         'type',
     ];
 
-    public function serviceAd()
+    public function ads()
     {
-        return $this->belongsTo(ServiceAd::class);
+        return $this->belongsTo(Ad::class);
     }
 
     // اختيارياً: URL كامل للملف

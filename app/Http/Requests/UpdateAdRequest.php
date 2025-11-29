@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateServiceAdRequest extends FormRequest
+class UpdateAdRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,7 +27,7 @@ class UpdateServiceAdRequest extends FormRequest
             'category_id' => 'nullable|exists:categories,id',
             'city_id'     => 'nullable|exists:cities,id',
             'region_id'   => 'nullable|exists:regions,id',
-            'is_active'   => 'nullable|boolean',
+            'status'      => 'nullable|in:active,pending,rejected,expired',
             'media'       => 'nullable|array|min:1',
             'media.*'     => 'file|mimes:jpg,jpeg,png,mp4,mov,avi|max:20480',
 

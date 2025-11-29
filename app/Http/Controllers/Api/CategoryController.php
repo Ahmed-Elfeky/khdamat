@@ -63,7 +63,7 @@ class CategoryController extends Controller
     public function providers($id)
     {
         // نجيب المستخدمين اللي عندهم إعلانات داخل الكاتيجوري المحدد
-        $users = User::whereHas('serviceAds', function ($q) use ($id) {
+        $users = User::whereHas('ads', function ($q) use ($id) {
             $q->where('category_id', $id);
         })
             ->withAvg('receivedRatings as average_rating', 'rating')
@@ -80,11 +80,11 @@ class CategoryController extends Controller
 
     public function getUsersByCategory($categoryId)
     {
-        $users = User::whereHas('serviceAds', function ($q) use ($categoryId) {
+        $users = User::whereHas('ads', function ($q) use ($categoryId) {
             $q->where('category_id', $categoryId);
         })
             ->with([
-                'serviceAds' => function ($q) use ($categoryId) {
+                'ads' => function ($q) use ($categoryId) {
                     $q->where('category_id', $categoryId);
                 }])
             ->withAvg('receivedRatings', 'rating')

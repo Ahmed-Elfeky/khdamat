@@ -49,10 +49,10 @@ class User extends Authenticatable
         return $this->otp_code === $otp && $this->otp_expires_at && now()->lt($this->otp_expires_at);
     }
 
-   
-    public function serviceAds()
+
+    public function ads()
     {
-        return $this->hasMany(ServiceAd::class);
+        return $this->hasMany(Ad::class);
     }
 
     public function ratings()

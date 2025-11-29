@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
    public function up()
 {
-    Schema::create('service_ads', function (Blueprint $table) {
+    Schema::create('ads', function (Blueprint $table) {
         $table->id();
 
         // بيانات الإعلان الأساسية
@@ -33,7 +33,7 @@ return new class extends Migration {
         $table->foreignId('user_id')->constrained()->onDelete('cascade');
 
         // حالة الإعلان
-        $table->boolean('is_active')->default(true);
+        $table->enum('status', ['active', 'pending', 'rejected', 'expired'])->default('pending');
 
         $table->timestamps();
     });
@@ -41,6 +41,6 @@ return new class extends Migration {
 
 public function down()
 {
-    Schema::dropIfExists('service_ads');
+    Schema::dropIfExists('ads');
 }
 };

@@ -21,7 +21,7 @@ class UserResource extends JsonResource
         // تقييم المتوسط
         'average_rating' => round($this->received_ratings_avg_rating, 1),
         'is_verified' => $this->is_verified,
-        'serviceAds'  => ServiceAdResource::collection($this->serviceAds)
+        'ads'  => AdResource::collection($this->ads)
     ];
 }
 

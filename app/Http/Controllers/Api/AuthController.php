@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\VerifyOtpRequest;
+use App\Http\Resources\RatingResource;
+use App\Http\Resources\AdResource;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -100,9 +102,50 @@ class AuthController extends Controller
     }
 
 
-    public function profile(Request $request)
+    public function show($id)
     {
-        return new UserResource($request->user());
+        $user = User::with([
+            'ads' => function ($q) {
+                $q->latest();
+            },
+            'ratings.user',
+        ])->find($id);
+
+        if (!$user) {
+            return ApiResponse::SendResponse(404, 'User not found', []);
+        }
+
+        $averageRating = $user->ratings()->avg('rating') ?? 0;
+
+        // توزيع عدد كل نجمة
+        $ratingDistribution = $user->ratings()
+            ->selectRaw('rating, COUNT(*) as count')
+            ->groupBy('rating')
+            ->pluck('count', 'rating');
+
+        return ApiResponse::SendResponse(200, 'Provider profile', [
+            'id' => $user->id,
+            'name' => $user->name,
+            'avatar' => $user->avatar ? asset($user->avatar) : null,
+            'phone' => $user->phone,
+            'whatsapp' => $user->whatsapp,
+            //  تقييمات
+            'rating' => [
+                'average' => round($averageRating, 1),
+                'count' => $user->ratings()->count(),
+                'distribution' => $ratingDistribution, // مثال: [5=>10, 4=>2 ...]
+            ],
+            //  آراء العملاء
+            'reviews' => RatingResource::collection($user->ratings()->latest()->get()),
+            //  الخدمات (قسم الخدمات)
+            'ads' => AdResource::collection(
+                $user->ads->where('type', 'service')
+            ),
+            //  الإعلانات (قسم السيارات مثلاً)
+            'shows' => AdResource::collection(
+                $user->ads->where('type', 'show')
+            ),
+        ]);
     }
 
     public function logout(Request $request)
@@ -110,5 +153,4 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
         return ApiResponse::SendResponse(200, 'Logged out successfully', []);
     }
-
 }
