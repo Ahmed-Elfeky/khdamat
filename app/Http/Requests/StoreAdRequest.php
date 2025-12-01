@@ -25,7 +25,7 @@ class StoreAdRequest extends FormRequest
             'category_id' => 'required|exists:categories,id',
             'city_id'     => 'nullable|exists:cities,id',
             'region_id'   => 'nullable|exists:regions,id',
-            'status'      => 'nullable|in:active,pending,rejected,expired',
+            'status'      => 'nullable|in:active,archived,deleted,finished',
             'media'       => 'nullable|array|min:1',
             'media.*'     => 'file|mimes:jpg,jpeg,png,mp4,mov,avi|max:20480',
 

@@ -180,36 +180,39 @@ class AdController extends Controller
         );
     }
 
+    public function status(Request $request)
+    {
+        // المستخدم الحالي
+        $user = auth()->user();
 
+        // الحالة المطلوبة
+        $status = $request->query('status', 'active');
 
-   public function status(Request $request)
-{
-    $user = auth()->user();  // ✔ المستخدم الحالي
+        // الحالات المتاحة فقط
+        $allowed = ['active', 'archived', 'deleted', 'finished'];
 
-    // الحالة المطلوبة (default = active)
-    $status = $request->query('status', 'active');
+        if (!in_array($status, $allowed)) {
+            return ApiResponse::SendResponse(422, 'Invalid status', []);
+        }
 
-    // query
-    $ads = Ad::with(['media', 'city'])
-        ->where('user_id', $user->id)  // ✔ دلوقتي عنده id
-        ->where('status', $status)
-        ->latest()
-        ->paginate(10);
+        //  الإعلانات حسب الحالة
+        $ads = Ad::where('user_id', $user->id)
+            ->where('status', $status)
+            ->orderBy('id', 'DESC')
+            ->get();
+        // Counters
+        $counts = [
+            'active'   => Ad::where('user_id', $user->id)->where('status', 'active')->count(),
+            'offers'   => Ad::where('user_id', $user->id)->where('status', 'offers')->count(),
+            'archived' => Ad::where('user_id', $user->id)->where('status', 'archived')->count(),
+            'deleted'  => Ad::where('user_id', $user->id)->where('status', 'deleted')->count(),
+            'finished' => Ad::where('user_id', $user->id)->where('status', 'finished')->count(),
+        ];
 
-    return ApiResponse::SendResponse(200, 'User ads retrieved', [
-        'status' => $status,
-        'counts' => [
-            'active'   => $user->ads()->where('status', 'active')->count(),
-            'pending'  => $user->ads()->where('status', 'pending')->count(),
-            'rejected' => $user->ads()->where('status', 'rejected')->count(),
-            'expired'  => $user->ads()->where('status', 'expired')->count(),
-        ],
-        'ads' => AdResource::collection($ads)->resource,
-    ]);
+        return ApiResponse::SendResponse(200, 'Ads fetched successfully', [
+            'status' => $status,
+            'counts' => $counts,
+            'ads'    => $ads,
+        ]);
+    }
 }
-
-}
-
-
-
-

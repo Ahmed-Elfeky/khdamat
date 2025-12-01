@@ -27,7 +27,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('ads/services', [AdController::class, 'getAllServices']);
     Route::get('ads/all-request', [AdController::class, 'allRequest']);
     Route::get('provider/{id}', [AuthController::class, 'show']);
-    Route::get('my-ads', [AdController::class, 'status']);
+    Route::get('my-ads-status', [AdController::class, 'status']);
 
     Route::apiResource('categories', CategoryController::class);
     Route::apiResource('regions', RegionController::class);
